@@ -36,3 +36,10 @@ def page_not_found(e):
 
 if __name__== '__main__':
     app.run(debug=True)
+# git config --global user.name "Dat Nguyen"
+# git config --global user.email "cddd4f@yahoo.com"
+# git config --global push.default matching
+# git config --global alias.co checkout
+# git init
+# source "d:/khoa k03/Flask/virt/Scripts/activate"
+# touch .gitignore
