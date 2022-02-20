@@ -43,3 +43,8 @@ if __name__== '__main__':
 # git init
 # source "d:/khoa k03/Flask/virt/Scripts/activate"
 # touch .gitignore
+# git remote add origin https://github.com/quangdat385/quangdat385.git
+# git branch -M main
+# git push -u origin main
+# git commit -am "tweaked 500.html"
+#  git push
