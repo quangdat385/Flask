@@ -18,7 +18,7 @@ def index():
     stuff= "This Is bold Text"
     
     favorite_pizza=["Pepperoni","Cheese","Mushrooms",41]
-    return render_template("template.html",first_name=first_name,
+    return render_template("index.html",first_name=first_name,
                             stuff=stuff,
                             favorite_pizza=favorite_pizza)
 # def index():
@@ -44,7 +44,13 @@ if __name__== '__main__':
 # source "d:/khoa k03/Flask/virt/Scripts/activate"
 # touch .gitignore
 # git remote add origin https://github.com/quangdat385/quangdat385.git
-# git branch -M main
+# 
+# 
 # git push -u origin main
 # git commit -am "tweaked 500.html"
 #  git push
+
+# run flask
+# export FLASK_ENV=development
+# export FLASK_APP=main.py
+# flask run
