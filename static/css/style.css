@@ -3,6 +3,11 @@ h1 {
     font-size: 60px;
 
 }
+h3 { 
+    color: blueviolet;
+    font-size: 60px;
+
+}
 body {
     background: #f4f4f4;
 }
