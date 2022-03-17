@@ -2,11 +2,15 @@
 
 from flask import Flask,render_template,flash,request
 from flask_wtf import FlaskForm 
-from wtforms import StringField,SubmitField
-from wtforms.validators import DataRequired
+from wtforms import StringField,SubmitField,PasswordField,BooleanField,ValidationError
+from wtforms.validators import DataRequired,EqualTo,Length
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+from datetime import date, datetime
 from flask_migrate import Migrate
+from werkzeug.security import generate_password_hash,check_password_hash
+from database import Customers
+from tkinter import*
+import mysql.connector
 
 app= Flask(__name__)
 
@@ -19,8 +23,20 @@ app.config["SECRET_KEY"] = "my supper secret key that no one is supposed to know
 db=SQLAlchemy(app)
 migrate=Migrate(app,db)
 
+def run_file():
+    myconn = mysql.connector.connect(host = "localhost", user = "root", 
+    passwd = "783151",database = "PythonDB")
 
+# # # tạo đối tượng cursor
+    cur = myconn.cursor()
+    root=Tk()
+    root.geometry("350x600")
+    app= Customers(root)
+    
 
+@app.route("/date")
+def run_file_python():
+    return {"Date":date.today()}
 
 class Users(db.Model):
     id=db.Column(db.Integer, primary_key=True)
@@ -29,14 +45,48 @@ class Users(db.Model):
     favorite_color=db.Column(db.String(120))
     date_added=db.Column(db.DateTime,default=datetime.utcnow)
     
+    password_hash=db.Column(db.String(128))
+    @property
+    def password(self):
+        raise AttributeError("password id not readable attribute!")
+    @password.setter
+    def password(self, password):
+        self.password_hash= generate_password_hash(password)
+        
+    def verify_password(self,password):
+        return check_password_hash(self.password_hash,password)
+    
     def __repr__(self):
         return '<Name %r>' % self.name
-
+@app.route('/delete/<int:id>')
+def delete(id):
+    user_to_delete=Users.query.get_or_404(id)
+    name=None   
+    form = UserForm()
+    try:
+        db.session.delete(user_to_delete)
+        db.session.commit()
+        flash('User Deleteed Successfully')
+        our_users=Users.query.order_by(Users.date_added)
+        return render_template("add_user.html",
+                        form=form,
+                        name=name,
+                        our_users=our_users)
+    
+    except:
+        flash('Whoops! There was a problem deleting user , try again')
+        return render_template("add_user.html",
+                        form=form,
+                        name=name,
+                        our_users=our_users)
 #Form
 class UserForm(FlaskForm):
     name = StringField("Name",validators=[DataRequired()])
     email = StringField("Email",validators=[DataRequired()])
     favorite_color=StringField("Favorite Color")
+    password_hash = PasswordField("Password",validators=[DataRequired(),
+                    EqualTo("password_hash2",message="Passwords Must Match!")])
+    password_hash2 = PasswordField("Confirm Password",validators=[DataRequired()])
     submit=SubmitField("Submit")
 class NamerForm(FlaskForm):
     name = StringField("Name",validators=[DataRequired()])
@@ -51,6 +101,7 @@ def update(id):
         name_to_update.name=request.form["name"]
         name_to_update.email=request.form["email"]
         name_to_update.favorite_color=request.form["favorite_color"]
+        name_to_update.password_hash=request.form["password_hash"]
         try :
             db.session.commit()
             flash("User updated successfully")
@@ -65,7 +116,8 @@ def update(id):
     else:   
         return render_template("update.html", 
                                 form=form ,  
-                                name_to_update=name_to_update)
+                                name_to_update=name_to_update,
+                                id=id)
     
 @app.route('/user/add',methods=["GET","POST"])
 def add_user():
@@ -74,14 +126,17 @@ def add_user():
     if form.validate_on_submit():
         user=Users.query.filter_by(email=form.email.data).first()
         if user is None:
+            hashed_pw=generate_password_hash(form.password_hash.data,"sha256")
             user=Users(name=form.name.data,email=form.email.data,
-                    favorite_color=form.favorite_color.data)
+                    favorite_color=form.favorite_color.data,
+                    password=hashed_pw)
             db.session.add(user)
             db.session.commit()
         name=form.name.data
         form.name.data=""
         form.email.data =""
         form.favorite_color.data =""
+        form.password_hash.data =""
         flash("User Added Successfully")
     our_users=Users.query.order_by(Users.date_added)
     return render_template("add_user.html",
@@ -165,3 +220,14 @@ if __name__== '__main__':
 # export FLASK_ENV=development
 # export FLASK_APP=main.py
 # flask run
+# pip install Flask-Migrate
+# flask db init 
+# flask db migrate -m "Initial Migration"
+# flask db upgrade
+# flask shell
+# from main import Users
+# u=Users()
+# u.password="cat"
+# u.password
+# u.password_hash
+# u.verify_password("cat)
