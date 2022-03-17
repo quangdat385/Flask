@@ -23,16 +23,7 @@ app.config["SECRET_KEY"] = "my supper secret key that no one is supposed to know
 db=SQLAlchemy(app)
 migrate=Migrate(app,db)
 
-def run_file():
-    myconn = mysql.connector.connect(host = "localhost", user = "root", 
-    passwd = "783151",database = "PythonDB")
 
-# # # tạo đối tượng cursor
-    cur = myconn.cursor()
-    root=Tk()
-    root.geometry("350x600")
-    app= Customers(root)
-    
 
 @app.route("/date")
 def run_file_python():
