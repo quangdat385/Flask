@@ -8,9 +8,7 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import date, datetime
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash,check_password_hash
-from database import Customers
-from tkinter import*
-import mysql.connector
+
 
 app= Flask(__name__)
 
